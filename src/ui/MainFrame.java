@@ -1,8 +1,12 @@
 package ui;
 
+import backends.Friend;
+import backends.Test;
+
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
 import javax.swing.*;
 
@@ -42,19 +46,27 @@ public class MainFrame extends JFrame implements ActionListener {
 	    jMenuBar=new JMenuBar();
 	    jMenuBar.add(option);
 	    this.setJMenuBar(jMenuBar);
-		this.add(new FriendShow());
+
 
 		this.setBounds(100, 100, 450, 300);
 		this.setVisible(true);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
+    public void listFriends(ArrayList<Friend> friends){
+	    Friend friend=friends.get(0);
+        FriendShow friendShow=new FriendShow(friend);
 
+	    this.add(friendShow);
+	    friendShow.updateUI();
+        System.out.println(888);
+    }
     @Override
     public void actionPerformed(ActionEvent e) {
         for (int i = 0; i < jMenuItems.length; i++) {
             if(e.getSource().equals(jMenuItems[i])){
                 switch (i) {
                     case 3:System.exit(0);
+                    case 2:listFriends(new Test().ListFriends());
                 }
                 break;
             }

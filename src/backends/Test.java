@@ -1,10 +1,13 @@
 package backends;
+import com.ibm.icu.impl.UResource;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 public class Test {
 
@@ -46,7 +49,7 @@ public class Test {
             pstm.setString(2, friend.getName());
             pstm.setString(3, friend.getSex());
             pstm.setInt(4, friend.getAge());
-            pstm.setString(5, friend.getPhone());
+            pstm.setString(5, friend.getImage());
             pstm.setString(6, friend.getPhone());
             pstm.executeUpdate();
         } catch (SQLException e) {
@@ -110,26 +113,31 @@ public class Test {
     /**
      * 向数据库中查询数据
      */
-    public void ListFriends() {
+    public ArrayList<Friend> ListFriends() {
+        ArrayList<Friend> friends=new ArrayList<>();
         connection = getConnection();
         String sql = "select * from FRIEND";
         try {
             pstm = connection.prepareStatement(sql);
             rs = pstm.executeQuery();
             while (rs.next()) {
-                String sno = rs.getString("id");
-                String name = rs.getString("name");
-                String gender = rs.getString("sex");
-                String age = rs.getString("age");
-                String sdept = rs.getString("phone");
-                System.out.println(sno + "\t" + name + "\t" + gender + "\t"
-                        + age + "\t" + sdept);
+                Friend friend=new Friend();
+                friend.setId(rs.getString("id"));
+                friend.setName(rs.getString("name"));
+                friend.setSex(rs.getString("sex"));
+                friend.setAge(Integer.parseInt(rs.getString("age")));
+                friend.setPhone(rs.getString("phone"));
+                friend.setImage(rs.getString("image"));
+                System.out.println(friend.getName() + "\t" + friend.getSex()+ "\t" + friend.getAge() + "\t"
+                        + friend.getPhone() + "\t" + friend.getImage());
+                friends.add(friend);
             }
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
             ReleaseResource();
         }
+        return friends;
     }
 
     /**
@@ -211,12 +219,13 @@ public class Test {
         friend.setPhone("15996356501");
         friend.setId("161530313");
         friend.setSex("女");
+        friend.setImage("D:\\java图标\\a.gif");
         Test test=new Test();
         test.AddFriend(friend);
         test.ListFriends();
         //test.UpdateData(friend);
-        test.DeleteFriend(friend);
-        test.ListFriends();
+        //test.DeleteFriend(friend);
+        //test.ListFriends();
 
 
     }
