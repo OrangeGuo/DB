@@ -1,9 +1,8 @@
 package ui;
 
+import backends.Dao;
 import backends.Friend;
-import backends.Test;
 
-import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -66,7 +65,7 @@ public class MainFrame extends JFrame implements ActionListener {
             if(e.getSource().equals(jMenuItems[i])){
                 switch (i) {
                     case 3:System.exit(0);
-                    case 2:listFriends(new Test().ListFriends());
+                    case 2:listFriends(new Dao().ListFriends());
                 }
                 break;
             }

@@ -1,5 +1,4 @@
 package backends;
-import com.ibm.icu.impl.UResource;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -9,7 +8,7 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-public class Test {
+public class Dao {
 
     // 定义连接所需的字符串
     // 192.168.0.X是本机地址(要改成自己的IP地址)，1521端口号，XE是精简版Oracle的默认数据库名
@@ -220,12 +219,12 @@ public class Test {
         friend.setId("161530313");
         friend.setSex("女");
         friend.setImage("D:\\java图标\\a.gif");
-        Test test=new Test();
-        test.AddFriend(friend);
-        test.ListFriends();
-        //test.UpdateData(friend);
-        //test.DeleteFriend(friend);
-        //test.ListFriends();
+        Dao dao =new Dao();
+        dao.AddFriend(friend);
+        dao.ListFriends();
+        //dao.UpdateData(friend);
+        //dao.DeleteFriend(friend);
+        //dao.ListFriends();
 
 
     }
