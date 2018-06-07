@@ -6,9 +6,13 @@ import javax.swing.*;
 
 public class FriendShow extends JPanel {
     JLabel name,sex,phone,age;
-    public FriendShow(Friend friend){
+    public FriendShow(){
         this.setLayout(null);
 
+
+    }
+
+    public void display(Friend friend){
         name = new JLabel("年龄"+friend.getName());
         name.setBounds(14, 26, 72, 18);
         this.add(name);
@@ -25,7 +29,8 @@ public class FriendShow extends JPanel {
         phone.setBounds(14, 149, 72, 18);
         this.add(phone);
 
-        Photo photo=new Photo(friend.getImage());
+        Photo photo=new Photo();
+        photo.setImage(friend.getImage());
         photo.setBounds(230, 36, 99, 99);
         this.add(photo);
     }

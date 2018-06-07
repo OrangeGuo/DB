@@ -218,7 +218,7 @@ public class Dao {
         friend.setPhone("15996356501");
         friend.setId("161530313");
         friend.setSex("女");
-        friend.setImage("D:\\java图标\\a.gif");
+        friend.setImage("D:\\java图标\\unamed.jpg");
         Dao dao =new Dao();
         dao.AddFriend(friend);
         dao.ListFriends();
