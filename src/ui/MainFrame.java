@@ -16,12 +16,13 @@ public class MainFrame extends JFrame implements ActionListener {
     JMenu option;
     JMenuItem[] jMenuItems ;
     String[] operations;
-    JButton add,next;
-
+    JButton add,reset,pre,next;
+    JPanel addPanel,showPanel;
     FriendShow friendShow;
     AddFriend addFriend;
     Dao dao;
     Photo mainPanel;
+    int flag=0;
 	/**
 	 * Launch the application.
 	 */
@@ -40,9 +41,10 @@ public class MainFrame extends JFrame implements ActionListener {
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {
-
+        addFriend=new AddFriend();
+        friendShow=new FriendShow();
         dao=new Dao();
-	    operations=new String[]{"添加好友","查找好友","好友展示","退出程序"};
+	    operations=new String[]{"退出程序","添加好友","查找好友","好友展示"};
 	    jMenuItems=new JMenuItem[operations.length];
 	    option=new JMenu("选项");
         for (int i = 0; i < jMenuItems.length; i++) {
@@ -53,59 +55,75 @@ public class MainFrame extends JFrame implements ActionListener {
 	    jMenuBar=new JMenuBar();
 	    jMenuBar.add(option);
 	    this.setJMenuBar(jMenuBar);
-
-        next=new JButton("下一个");
+        add=new JButton("添加");
+        add.addActionListener(this);
+        reset=new JButton("重置");
+        reset.addActionListener(this);
+        pre=new JButton("上一页");
+        pre.addActionListener(this);
+        next=new JButton("下一页");
         next.addActionListener(this);
-        mainPanel=new Photo(450,300);
-
-        mainPanel.setImage("D:\\java图标\\background.jpg");
-
-        this.add(mainPanel);
+        addPanel=new JPanel();
+        addPanel.add(add);
+        addPanel.add(reset);
+        showPanel=new JPanel();
+        showPanel.add(pre);
+        showPanel.add(next);
+        //this.add(mainPanel);
 		this.setBounds(100, 100, 450, 300);
 		this.setVisible(true);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 	}
 
-    /**
-     * @param friends
-     * display the information of all friends
-     */
-    public void listFriends(ArrayList<Friend> friends){
-	    Friend friend=friends.get(0);
-        FriendShow friendShow=new FriendShow();
-        friendShow.display(friend);
-
+ 
+    public void listFriends(){
         this.add(friendShow);
-	    this.add(next,BorderLayout.SOUTH);
+	    this.add(showPanel,BorderLayout.SOUTH);
 	    friendShow.updateUI();
-        System.out.println(888);
     }
 
     /**
      * get into the windows for adding friend
      */
     public void addFriend(){
-
-	    //this.removeAll();
-	    addFriend=new AddFriend();
-
 	    this.add(addFriend);
-	    add=new JButton("添加");
-	    add.addActionListener(this);
-	    this.add(add,BorderLayout.SOUTH);
+	    this.add(addPanel,BorderLayout.SOUTH);
 	    addFriend.updateUI();
 
+    }
+    public void actionHandler(int command){
+        if(flag==command)return;
+        if(flag==0){
+            if(command==1){
+                addFriend();
+            }else if(command==3){
+                listFriends();
+            }
+        }
+        else if(flag==1){
+            this.remove(addFriend);
+            this.remove(addPanel);
+            if(command==3){
+                listFriends();
+            }
+        }
+        else if(flag==3){
+            this.remove(friendShow);
+            this.remove(showPanel);
+            if(command==1)
+                addFriend();
+        }
+        flag=command;
     }
     @Override
     public void actionPerformed(ActionEvent e) {
         for (int i = 0; i < jMenuItems.length; i++) {
             if(e.getSource().equals(jMenuItems[i])){
-                switch (i) {
-                    case 3:System.exit(0);break;
-                    case 2:listFriends(dao.ListFriends());break;
-					case 0: addFriend();break;
-                }
+                if(i==0)
+                    System.exit(0);
+                else
+                    actionHandler(i);
                 break;
             }
         }
@@ -116,6 +134,9 @@ public class MainFrame extends JFrame implements ActionListener {
                 friend.setId(String.valueOf(id+1));
                 dao.AddFriend(friend);
             }
+        }
+        else if(e.getSource().equals(reset)){
+            addFriend.reset();
         }
     }
 }

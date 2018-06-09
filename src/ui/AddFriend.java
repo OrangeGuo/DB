@@ -16,10 +16,9 @@ public class AddFriend extends JPanel implements ActionListener {
     private JButton selectIcon;
     private Photo photo;
     private String image="D:\\java图标\\unamed.jpg";
-    //private Image background;
+
     public AddFriend(){
-        //background=Toolkit.getDefaultToolkit().getImage("D:\\java图标\\background.jpg");
-        //this.repaint();
+
         this.setLayout(null);
         name = new JTextField();
         name.setBounds(60, 27, 86, 24);
@@ -64,10 +63,18 @@ public class AddFriend extends JPanel implements ActionListener {
 
         photo=new Photo(99,99);
         photo.setBounds(216, 70, 99, 99);
-        //this.add(photo);
+        this.add(photo);
+        this.setBackground(Color.white);
        // this.setOpaque(false);
     }
 
+    public void reset(){
+        this.photo.setImage("D:\\java图标\\unamed.jpg");
+        this.name.setText("");
+        this.sex.setText("");
+        this.age.setText("");
+        this.phone.setText("");
+    }
     public boolean checkInput(){
         if(name.getText().trim().length()==0)
             return false;
