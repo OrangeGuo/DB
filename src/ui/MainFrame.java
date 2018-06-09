@@ -21,6 +21,7 @@ public class MainFrame extends JFrame implements ActionListener {
     FriendShow friendShow;
     AddFriend addFriend;
     Dao dao;
+    Photo mainPanel;
 	/**
 	 * Launch the application.
 	 */
@@ -39,7 +40,8 @@ public class MainFrame extends JFrame implements ActionListener {
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {
-	    dao=new Dao();
+
+        dao=new Dao();
 	    operations=new String[]{"添加好友","查找好友","好友展示","退出程序"};
 	    jMenuItems=new JMenuItem[operations.length];
 	    option=new JMenu("选项");
@@ -54,10 +56,15 @@ public class MainFrame extends JFrame implements ActionListener {
 
         next=new JButton("下一个");
         next.addActionListener(this);
+        mainPanel=new Photo(450,300);
 
+        mainPanel.setImage("D:\\java图标\\background.jpg");
+
+        this.add(mainPanel);
 		this.setBounds(100, 100, 450, 300);
 		this.setVisible(true);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
 	}
 
     /**
@@ -68,7 +75,8 @@ public class MainFrame extends JFrame implements ActionListener {
 	    Friend friend=friends.get(0);
         FriendShow friendShow=new FriendShow();
         friendShow.display(friend);
-	    this.add(friendShow);
+
+        this.add(friendShow);
 	    this.add(next,BorderLayout.SOUTH);
 	    friendShow.updateUI();
         System.out.println(888);

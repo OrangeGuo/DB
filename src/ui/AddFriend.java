@@ -3,6 +3,7 @@ package ui;
 import backends.Friend;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -15,7 +16,10 @@ public class AddFriend extends JPanel implements ActionListener {
     private JButton selectIcon;
     private Photo photo;
     private String image="D:\\java图标\\unamed.jpg";
+    //private Image background;
     public AddFriend(){
+        //background=Toolkit.getDefaultToolkit().getImage("D:\\java图标\\background.jpg");
+        //this.repaint();
         this.setLayout(null);
         name = new JTextField();
         name.setBounds(60, 27, 86, 24);
@@ -58,10 +62,12 @@ public class AddFriend extends JPanel implements ActionListener {
         selectIcon.addActionListener(this);
         this.add(selectIcon);
 
-        photo=new Photo();
+        photo=new Photo(99,99);
         photo.setBounds(216, 70, 99, 99);
-        this.add(photo);
+        //this.add(photo);
+       // this.setOpaque(false);
     }
+
     public boolean checkInput(){
         if(name.getText().trim().length()==0)
             return false;

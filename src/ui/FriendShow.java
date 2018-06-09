@@ -29,7 +29,7 @@ public class FriendShow extends JPanel {
         phone.setBounds(14, 149, 72, 18);
         this.add(phone);
 
-        Photo photo=new Photo();
+        Photo photo=new Photo(99,99);
         photo.setImage(friend.getImage());
         photo.setBounds(230, 36, 99, 99);
         this.add(photo);
