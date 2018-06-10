@@ -18,13 +18,13 @@ public class MainFrame extends JFrame implements ActionListener {
     JLabel result;
     String[] operations;
     JTextField searchInput;
-    JButton add,reset,pre,next,search;
-    JPanel addPanel,showPanel,searchPanel;
+    JButton add,reset,pre,next,search,edit,delete,cancle,ok;
+    JPanel addPanel,showPanel,searchPanel,resultPanel,editPanel;
     FriendShow friendShow;
     AddFriend addFriend;
     Dao dao;
     Photo mainPanel;
-    ArrayList<Friend> friends,target;
+    ArrayList<Friend> friends,target,pointer;
     boolean isModified=true;
     int flag=0;
 	/**
@@ -72,16 +72,30 @@ public class MainFrame extends JFrame implements ActionListener {
         next.addActionListener(this);
         search=new JButton("搜索");
         search.addActionListener(this);
+        edit=new JButton("编辑");
+        edit.addActionListener(this);
+        delete=new JButton("删除");
+        delete.addActionListener(this);
+        cancle=new JButton("取消");
+        cancle.addActionListener(this);
+        ok=new JButton("保存");
+        ok.addActionListener(this);
         searchInput=new JTextField(10);
         addPanel=new JPanel();
         addPanel.add(add);
         addPanel.add(reset);
         showPanel=new JPanel();
-        showPanel.add(pre);
-        showPanel.add(next);
+
         searchPanel=new JPanel();
         searchPanel.add(searchInput);
         searchPanel.add(search);
+        resultPanel=new JPanel();
+
+        resultPanel.add(delete);
+        resultPanel.add(edit);
+        editPanel=new JPanel();
+        editPanel.add(cancle);
+        editPanel.add(ok);
         //this.add(mainPanel);
 		this.setBounds(100, 100, 450, 300);
 		this.setVisible(true);
@@ -98,8 +112,11 @@ public class MainFrame extends JFrame implements ActionListener {
             friends=dao.ListFriends();
         this.add(friendShow);
 	    this.add(showPanel,BorderLayout.SOUTH);
+        showPanel.add(pre);
+        showPanel.add(next);
 	    friendShow.display(friends.get(0),0);
 	    friendShow.updateUI();
+	    pointer=friends;
     }
 
     /**
@@ -158,6 +175,26 @@ public class MainFrame extends JFrame implements ActionListener {
             else if(command==2)
                 searchFriend();
         }
+        else if(flag==4){
+            this.remove(friendShow);
+            this.remove(resultPanel);
+            if(command==1)
+                addFriend();
+            else if(command==2)
+                searchFriend();
+            else if(command==3)
+                listFriends();
+        }
+        else if(flag==5){
+            this.remove(addFriend);
+            this.remove(editPanel);
+            if(command==1)
+                addFriend();
+            else if(command==2)
+                searchFriend();
+            else if(command==3)
+                this.listFriends();
+        }
         flag=command;
     }
     @Override
@@ -196,19 +233,56 @@ public class MainFrame extends JFrame implements ActionListener {
                     }
                 }
                 if(target.size()>0){
-                    System.out.printf("888");
+                    this.remove(searchPanel);
+                    this.remove(result);
+                    this.add(friendShow);
+                    pointer=target;
+                    friendShow.display(pointer.get(0),0);
+                    friendShow.updateUI();
+                    resultPanel.add(next);
+                    resultPanel.add(pre);
+                    this.add(resultPanel,BorderLayout.SOUTH);
+                    resultPanel.updateUI();
+                    flag=4;
                 }else
                     result.setText("没有相关结果");
                     result.setHorizontalTextPosition(JLabel.CENTER);
             }
         }
         else if(e.getSource().equals(next)){
-            int index=(friendShow.getPosition()+1)%friends.size();
-            friendShow.display(friends.get(index),index);
+            int index=(friendShow.getPosition()+1)%pointer.size();
+            friendShow.display(pointer.get(index),index);
         }
         else if(e.getSource().equals(pre)){
-            int index=(friendShow.getPosition()+friends.size()-1)%friends.size();
-            friendShow.display(friends.get(index),index);
+            int index=(friendShow.getPosition()+pointer.size()-1)%pointer.size();
+            friendShow.display(pointer.get(index),index);
+        }
+        else if(e.getSource().equals(delete)){
+            isModified=true;
+            dao.DeleteFriend(target.get(friendShow.getPosition()));
+            target.remove(friendShow.getPosition());
+            if(target.size()>0){
+                int index=friendShow.getPosition()%target.size();
+                friendShow.display(target.get(index),index);
+            }
+        }
+        else if(e.getSource().equals(edit)){
+            flag=5;
+            this.remove(friendShow);
+            this.remove(resultPanel);
+            this.add(addFriend);
+            addFriend.edit(target.get(friendShow.getPosition()));
+            addFriend.updateUI();
+            this.add(editPanel,BorderLayout.SOUTH);
+            editPanel.updateUI();
+        }
+        else if(e.getSource().equals(ok)){
+            isModified=true;
+            dao.UpdateData(target.get(friendShow.getPosition()));
+            actionHandler(3);
+        }
+        else if(e.getSource().equals(cancle)){
+            actionHandler(3);
         }
     }
 }

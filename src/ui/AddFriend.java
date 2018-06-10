@@ -75,6 +75,13 @@ public class AddFriend extends JPanel implements ActionListener {
         this.age.setText("");
         this.phone.setText("");
     }
+    public void edit(Friend friend){
+        this.phone.setText(friend.getPhone());
+        this.name.setText(friend.getName());
+        this.sex.setText(friend.getSex());
+        this.age.setText(friend.getAge()+"");
+        this.photo.setImage(friend.getImage());
+    }
     public boolean checkInput(){
         if(name.getText().trim().length()==0)
             return false;
