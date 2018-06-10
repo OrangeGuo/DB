@@ -215,6 +215,9 @@ public class MainFrame extends JFrame implements ActionListener {
                 friend.setId(String.valueOf(id+1));
                 dao.AddFriend(friend);
             }
+            else{
+                JOptionPane.showMessageDialog(null, "输入非法！", "警告", JOptionPane.ERROR_MESSAGE);
+            }
         }
         else if(e.getSource().equals(reset)){
             addFriend.reset();
@@ -277,9 +280,14 @@ public class MainFrame extends JFrame implements ActionListener {
             editPanel.updateUI();
         }
         else if(e.getSource().equals(ok)){
-            isModified=true;
-            dao.UpdateData(target.get(friendShow.getPosition()));
-            actionHandler(3);
+            if(addFriend.checkInput()){
+                isModified=true;
+                dao.UpdateData(addFriend.getInput());
+                actionHandler(3);
+            }
+            else{
+                JOptionPane.showMessageDialog(null, "输入非法！", "警告", JOptionPane.ERROR_MESSAGE);
+            }
         }
         else if(e.getSource().equals(cancle)){
             actionHandler(3);

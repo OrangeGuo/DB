@@ -11,16 +11,16 @@ public class FriendShow extends JPanel {
     public FriendShow(){
         this.setLayout(null);
         name = new JLabel();
-        name.setBounds(14, 26, 72, 18);
+        name.setBounds(14, 26, 150, 18);
         this.add(name);
         sex = new JLabel();
-        sex.setBounds(14, 66, 72, 18);
+        sex.setBounds(14, 66, 50, 18);
         this.add(sex);
         age = new JLabel();
-        age.setBounds(14, 111, 72, 18);
+        age.setBounds(14, 111, 50, 18);
         this.add(age);
         phone = new JLabel();
-        phone.setBounds(14, 149, 72, 18);
+        phone.setBounds(14, 149, 150, 18);
         this.add(phone);
         photo=new Photo(99,99);
         photo.setBounds(230, 36, 99, 99);

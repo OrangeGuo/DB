@@ -16,7 +16,7 @@ public class AddFriend extends JPanel implements ActionListener {
     private JButton selectIcon;
     private Photo photo;
     private String image="D:\\java图标\\unamed.jpg";
-
+    private String id;
     public AddFriend(){
 
         this.setLayout(null);
@@ -74,6 +74,8 @@ public class AddFriend extends JPanel implements ActionListener {
         this.sex.setText("");
         this.age.setText("");
         this.phone.setText("");
+        this.image="D:\\java图标\\unamed.jpg";
+        this.id="";
     }
     public void edit(Friend friend){
         this.phone.setText(friend.getPhone());
@@ -81,11 +83,16 @@ public class AddFriend extends JPanel implements ActionListener {
         this.sex.setText(friend.getSex());
         this.age.setText(friend.getAge()+"");
         this.photo.setImage(friend.getImage());
+        this.image=friend.getImage();
+        this.id=friend.getId();
     }
     public boolean checkInput(){
-        if(name.getText().trim().length()==0)
+        if(name.getText().trim().length()==0||phone.getText().trim().length()!=11)
             return false;
-
+        if(!(sex.getText().trim().equals("男")||sex.getText().trim().equals("女")))
+            return false;
+        if(Integer.parseInt(age.getText().trim())<8)
+            return false;
         return true;
     }
 
@@ -96,6 +103,8 @@ public class AddFriend extends JPanel implements ActionListener {
         friend.setSex(sex.getText().trim());
         friend.setAge(Integer.parseInt(age.getText().trim()));
         friend.setPhone(phone.getText().trim());
+        friend.setId(id);
+        this.reset();
         return friend;
     }
     @Override
