@@ -19,14 +19,14 @@ public class MainFrame extends JFrame implements ActionListener {
     String[] operations;
     JTextField searchInput;
     JButton add,reset,pre,next,search,edit,delete,cancle,ok;
-    JPanel addPanel,showPanel,searchPanel,resultPanel,editPanel;
+    JPanel addPanel,showPanel,searchPanel,resultPanel,editPanel,mainPanel;
     FriendShow friendShow;
     AddFriend addFriend;
     Dao dao;
-    Photo mainPanel;
+
     ArrayList<Friend> friends,target,pointer;
     boolean isModified=true;
-    int flag=0;
+
 	/**
 	 * Launch the application.
 	 */
@@ -96,7 +96,9 @@ public class MainFrame extends JFrame implements ActionListener {
         editPanel=new JPanel();
         editPanel.add(cancle);
         editPanel.add(ok);
-        //this.add(mainPanel);
+        mainPanel=new JPanel();
+        mainPanel.setLayout(new BorderLayout());
+        this.add(mainPanel);
 		this.setBounds(100, 100, 450, 300);
 		this.setVisible(true);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -110,12 +112,12 @@ public class MainFrame extends JFrame implements ActionListener {
     public void listFriends(){
         if(isModified||friends.size()==0)
             friends=dao.ListFriends();
-        this.add(friendShow);
-	    this.add(showPanel,BorderLayout.SOUTH);
+        isModified=false;
+        mainPanel.add(friendShow);
+	    mainPanel.add(showPanel,BorderLayout.SOUTH);
         showPanel.add(pre);
         showPanel.add(next);
 	    friendShow.display(friends.get(0),0);
-	    friendShow.updateUI();
 	    pointer=friends;
     }
 
@@ -123,9 +125,8 @@ public class MainFrame extends JFrame implements ActionListener {
      * get into the windows for adding friend
      */
     public void addFriend(){
-	    this.add(addFriend);
-	    this.add(addPanel,BorderLayout.SOUTH);
-	    addFriend.updateUI();
+	    mainPanel.add(addFriend);
+	    mainPanel.add(addPanel,BorderLayout.SOUTH);
 
     }
 
@@ -133,15 +134,31 @@ public class MainFrame extends JFrame implements ActionListener {
      * search friends
      */
     public void searchFriend(){
-        this.add(searchPanel,BorderLayout.NORTH);
+        mainPanel.add(searchPanel,BorderLayout.NORTH);
         searchInput.setToolTipText("输入姓名或者手机号");
-        searchPanel.updateUI();
-        this.add(result);
-        result.updateUI();
+        mainPanel.add(result);
+
     }
+
+    /**
+     * @return if friend is already in your database
+     */
+    public boolean isExist(Friend friend){
+        if(isModified||friends.size()==0)
+            friends=dao.ListFriends();
+        for (int i = 0; i < friends.size(); i++) {
+            Friend friendToCompare=friends.get(i);
+            if(friend.getName().equals(friendToCompare.getName())&&friend.getPhone().equals(friendToCompare.getPhone()))
+                return true;
+        }
+        return false;
+    }
+
+    /**
+     * @param command
+     */
     public void actionHandler(int command){
-        if(flag==command)return;
-        if(flag==0){
+        mainPanel.removeAll();
             if(command==1){
                 addFriend();
             }else if(command==2)
@@ -149,53 +166,7 @@ public class MainFrame extends JFrame implements ActionListener {
             else if(command==3){
                 listFriends();
             }
-        }
-        else if(flag==1){
-            this.remove(addFriend);
-            this.remove(addPanel);
-            if(command==3){
-                listFriends();
-            }
-            else if(command==2)
-                searchFriend();
-        }
-        else if(flag==2){
-            this.remove(searchPanel);
-            this.remove(result);
-            if(command==1)
-                 addFriend();
-            else if(command==3)
-                listFriends();
-        }
-        else if(flag==3){
-            this.remove(friendShow);
-            this.remove(showPanel);
-            if(command==1)
-                addFriend();
-            else if(command==2)
-                searchFriend();
-        }
-        else if(flag==4){
-            this.remove(friendShow);
-            this.remove(resultPanel);
-            if(command==1)
-                addFriend();
-            else if(command==2)
-                searchFriend();
-            else if(command==3)
-                listFriends();
-        }
-        else if(flag==5){
-            this.remove(addFriend);
-            this.remove(editPanel);
-            if(command==1)
-                addFriend();
-            else if(command==2)
-                searchFriend();
-            else if(command==3)
-                this.listFriends();
-        }
-        flag=command;
+        mainPanel.updateUI();
     }
     @Override
     public void actionPerformed(ActionEvent e) {
@@ -210,10 +181,22 @@ public class MainFrame extends JFrame implements ActionListener {
         }
         if(e.getSource().equals(add)){
             if(addFriend.checkInput()){
-                int id=dao.ListFriends().size();
+                if(isModified||friends.size()==0)
+                    friends=dao.ListFriends();
                 Friend friend=addFriend.getInput();
-                friend.setId(String.valueOf(id+1));
-                dao.AddFriend(friend);
+                if(!isExist(friend)) {
+                    int id=0;
+                    for (int i = 0; i < friends.size(); i++) {
+                        int temp=Integer.parseInt(friends.get(i).getId());
+                        if(temp>id)
+                            id=temp;
+                    }
+                    id++;
+                    friend.setId(String.valueOf(id));
+                    dao.AddFriend(friend);
+                }
+                else
+                    JOptionPane.showMessageDialog(null, "好友已存在！", "警告", JOptionPane.ERROR_MESSAGE);
             }
             else{
                 JOptionPane.showMessageDialog(null, "输入非法！", "警告", JOptionPane.ERROR_MESSAGE);
@@ -236,21 +219,19 @@ public class MainFrame extends JFrame implements ActionListener {
                     }
                 }
                 if(target.size()>0){
-                    this.remove(searchPanel);
-                    this.remove(result);
-                    this.add(friendShow);
+                    mainPanel.removeAll();
+                    mainPanel.add(friendShow);
                     pointer=target;
                     friendShow.display(pointer.get(0),0);
-                    friendShow.updateUI();
                     resultPanel.add(next);
                     resultPanel.add(pre);
-                    this.add(resultPanel,BorderLayout.SOUTH);
-                    resultPanel.updateUI();
-                    flag=4;
+                    mainPanel.add(resultPanel,BorderLayout.SOUTH);
+
                 }else
                     result.setText("没有相关结果");
                     result.setHorizontalTextPosition(JLabel.CENTER);
             }
+            mainPanel.updateUI();
         }
         else if(e.getSource().equals(next)){
             int index=(friendShow.getPosition()+1)%pointer.size();
@@ -268,22 +249,28 @@ public class MainFrame extends JFrame implements ActionListener {
                 int index=friendShow.getPosition()%target.size();
                 friendShow.display(target.get(index),index);
             }
+            else if(target.size()==0){
+                result.setText("空空如也，请添加好友");
+                mainPanel.removeAll();
+                mainPanel.add(result);
+                mainPanel.updateUI();
+            }
         }
         else if(e.getSource().equals(edit)){
-            flag=5;
-            this.remove(friendShow);
-            this.remove(resultPanel);
-            this.add(addFriend);
+            mainPanel.removeAll();
+            mainPanel.add(addFriend);
             addFriend.edit(target.get(friendShow.getPosition()));
-            addFriend.updateUI();
-            this.add(editPanel,BorderLayout.SOUTH);
-            editPanel.updateUI();
+            mainPanel.add(editPanel,BorderLayout.SOUTH);
+            mainPanel.updateUI();
         }
         else if(e.getSource().equals(ok)){
             if(addFriend.checkInput()){
                 isModified=true;
-                dao.UpdateData(addFriend.getInput());
-                actionHandler(3);
+                if(!isExist(addFriend.getInput()))
+                    actionHandler(3);
+                else
+                    JOptionPane.showMessageDialog(null, "好友已存在！", "警告", JOptionPane.ERROR_MESSAGE);
+
             }
             else{
                 JOptionPane.showMessageDialog(null, "输入非法！", "警告", JOptionPane.ERROR_MESSAGE);
