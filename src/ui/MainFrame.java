@@ -16,6 +16,9 @@ public class MainFrame extends JFrame implements ActionListener {
     JMenu option;
     JMenuItem[] jMenuItems ;
     JLabel result;
+    DefaultListModel defaultListModel;
+    JList jList;
+    JScrollPane jScrollPane;
     String[] operations;
     JTextField searchInput;
     JButton add,reset,pre,next,search,edit,delete,cancle,ok;
@@ -49,8 +52,12 @@ public class MainFrame extends JFrame implements ActionListener {
 	    target=new ArrayList<>();
         addFriend=new AddFriend();
         friendShow=new FriendShow();
+        defaultListModel=new DefaultListModel();
+        jList=new JList(defaultListModel);
+        jScrollPane=new JScrollPane(jList);
+        jScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         dao=new Dao();
-	    operations=new String[]{"退出程序","添加好友","查找好友","好友展示"};
+	    operations=new String[]{"退出程序","添加好友","好友管理","好友展示"};
 	    jMenuItems=new JMenuItem[operations.length];
 	    option=new JMenu("选项");
         for (int i = 0; i < jMenuItems.length; i++) {
@@ -113,11 +120,17 @@ public class MainFrame extends JFrame implements ActionListener {
         if(isModified||friends.size()==0)
             friends=dao.ListFriends();
         isModified=false;
-        mainPanel.add(friendShow);
-	    mainPanel.add(showPanel,BorderLayout.SOUTH);
-        showPanel.add(pre);
-        showPanel.add(next);
-	    friendShow.display(friends.get(0),0);
+        if(friends.size()>0){
+            mainPanel.add(friendShow);
+            mainPanel.add(showPanel,BorderLayout.SOUTH);
+            showPanel.add(pre);
+            showPanel.add(next);
+            friendShow.display(friends.get(0),0);
+        }
+        else{
+            result.setText("空空如也，请添加好友");
+            mainPanel.add(result);
+        }
 	    pointer=friends;
     }
 
@@ -136,7 +149,14 @@ public class MainFrame extends JFrame implements ActionListener {
     public void searchFriend(){
         mainPanel.add(searchPanel,BorderLayout.NORTH);
         searchInput.setToolTipText("输入姓名或者手机号");
-        mainPanel.add(result);
+        if(isModified||friends.size()==0)
+            friends=dao.ListFriends();
+        isModified=false;
+        defaultListModel.removeAllElements();
+        for (int i = 0; i < friends.size(); i++) {
+            defaultListModel.addElement(friends.get(i).getName());
+        }
+        mainPanel.add(jScrollPane);
 
     }
 
@@ -187,7 +207,7 @@ public class MainFrame extends JFrame implements ActionListener {
                 if(!isExist(friend)) {
                     int id=0;
                     for (int i = 0; i < friends.size(); i++) {
-                        int temp=Integer.parseInt(friends.get(i).getId());
+                        int temp=Integer.parseInt(friends.get(i).getId().trim());
                         if(temp>id)
                             id=temp;
                     }
@@ -219,12 +239,13 @@ public class MainFrame extends JFrame implements ActionListener {
                     }
                 }
                 if(target.size()>0){
+                    defaultListModel.removeAllElements();
+                    for (int i = 0; i < target.size(); i++) {
+                        defaultListModel.addElement(target.get(i).getName());
+                    }
                     mainPanel.removeAll();
-                    mainPanel.add(friendShow);
-                    pointer=target;
-                    friendShow.display(pointer.get(0),0);
-                    resultPanel.add(next);
-                    resultPanel.add(pre);
+                    mainPanel.add(searchPanel,BorderLayout.NORTH);
+                    mainPanel.add(jScrollPane);
                     mainPanel.add(resultPanel,BorderLayout.SOUTH);
 
                 }else
