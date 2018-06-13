@@ -6,6 +6,8 @@ import backends.Friend;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.ArrayList;
 
 import javax.swing.*;
@@ -21,7 +23,7 @@ public class MainFrame extends JFrame implements ActionListener {
     JScrollPane jScrollPane;
     String[] operations;
     JTextField searchInput;
-    JButton add,reset,pre,next,search,edit,delete,cancle,ok;
+    JButton add,reset,pre,next,search,edit,delete,cancle,ok,more;
     JPanel addPanel,showPanel,searchPanel,resultPanel,editPanel,mainPanel;
     FriendShow friendShow;
     AddFriend addFriend;
@@ -54,6 +56,7 @@ public class MainFrame extends JFrame implements ActionListener {
         friendShow=new FriendShow();
         defaultListModel=new DefaultListModel();
         jList=new JList(defaultListModel);
+
         jScrollPane=new JScrollPane(jList);
         jScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         dao=new Dao();
@@ -69,6 +72,7 @@ public class MainFrame extends JFrame implements ActionListener {
 	    jMenuBar=new JMenuBar();
 	    jMenuBar.add(option);
 	    this.setJMenuBar(jMenuBar);
+
         add=new JButton("添加");
         add.addActionListener(this);
         reset=new JButton("重置");
@@ -87,22 +91,32 @@ public class MainFrame extends JFrame implements ActionListener {
         cancle.addActionListener(this);
         ok=new JButton("保存");
         ok.addActionListener(this);
+        more=new JButton("查看");
+        more.addActionListener(this);
+
         searchInput=new JTextField(10);
+
         addPanel=new JPanel();
         addPanel.add(add);
         addPanel.add(reset);
+
         showPanel=new JPanel();
+        showPanel.add(pre);
+        showPanel.add(next);
 
         searchPanel=new JPanel();
         searchPanel.add(searchInput);
         searchPanel.add(search);
-        resultPanel=new JPanel();
 
+        resultPanel=new JPanel();
         resultPanel.add(delete);
         resultPanel.add(edit);
+        resultPanel.add(more);
+
         editPanel=new JPanel();
         editPanel.add(cancle);
         editPanel.add(ok);
+
         mainPanel=new JPanel();
         mainPanel.setLayout(new BorderLayout());
         this.add(mainPanel);
@@ -123,8 +137,6 @@ public class MainFrame extends JFrame implements ActionListener {
         if(friends.size()>0){
             mainPanel.add(friendShow);
             mainPanel.add(showPanel,BorderLayout.SOUTH);
-            showPanel.add(pre);
-            showPanel.add(next);
             friendShow.display(friends.get(0),0);
         }
         else{
@@ -157,7 +169,8 @@ public class MainFrame extends JFrame implements ActionListener {
             defaultListModel.addElement(friends.get(i).getName());
         }
         mainPanel.add(jScrollPane);
-
+        mainPanel.add(resultPanel,BorderLayout.SOUTH);
+        pointer=friends;
     }
 
     /**
@@ -247,12 +260,12 @@ public class MainFrame extends JFrame implements ActionListener {
                     mainPanel.add(searchPanel,BorderLayout.NORTH);
                     mainPanel.add(jScrollPane);
                     mainPanel.add(resultPanel,BorderLayout.SOUTH);
-
+                    pointer=target;
                 }else
                     result.setText("没有相关结果");
                     result.setHorizontalTextPosition(JLabel.CENTER);
             }
-            mainPanel.updateUI();
+
         }
         else if(e.getSource().equals(next)){
             int index=(friendShow.getPosition()+1)%pointer.size();
@@ -262,27 +275,26 @@ public class MainFrame extends JFrame implements ActionListener {
             int index=(friendShow.getPosition()+pointer.size()-1)%pointer.size();
             friendShow.display(pointer.get(index),index);
         }
-        else if(e.getSource().equals(delete)){
+        else if(e.getSource().equals(delete)&&jList.getSelectedIndex()!=-1){
             isModified=true;
-            dao.DeleteFriend(target.get(friendShow.getPosition()));
-            target.remove(friendShow.getPosition());
-            if(target.size()>0){
+            dao.DeleteFriend(pointer.get(jList.getSelectedIndex()));
+            pointer.remove(jList.getSelectedIndex());
+            if(pointer.size()>0){
                 int index=friendShow.getPosition()%target.size();
                 friendShow.display(target.get(index),index);
             }
-            else if(target.size()==0){
+            else if(pointer.size()==0){
                 result.setText("空空如也，请添加好友");
                 mainPanel.removeAll();
                 mainPanel.add(result);
-                mainPanel.updateUI();
+
             }
         }
-        else if(e.getSource().equals(edit)){
-            mainPanel.removeAll();
-            mainPanel.add(addFriend);
-            addFriend.edit(target.get(friendShow.getPosition()));
-            mainPanel.add(editPanel,BorderLayout.SOUTH);
-            mainPanel.updateUI();
+        else if(e.getSource().equals(edit)&&jList.getSelectedIndex()!=-1){
+                mainPanel.removeAll();
+                mainPanel.add(addFriend);
+                addFriend.edit(pointer.get(jList.getSelectedIndex()));
+                mainPanel.add(editPanel,BorderLayout.SOUTH);
         }
         else if(e.getSource().equals(ok)){
             if(addFriend.checkInput()){
@@ -300,5 +312,14 @@ public class MainFrame extends JFrame implements ActionListener {
         else if(e.getSource().equals(cancle)){
             actionHandler(3);
         }
+        else if(e.getSource().equals(more)&&jList.getSelectedIndex()!=-1){
+
+                mainPanel.removeAll();
+                friendShow.display(pointer.get(jList.getSelectedIndex()),-1);
+                mainPanel.add(friendShow);
+        }
+        mainPanel.updateUI();
     }
+
+
 }
